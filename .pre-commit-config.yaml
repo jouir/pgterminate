@@ -1,0 +1,11 @@
+---
+- repo: git://github.com/dnephin/pre-commit-golang
+  sha: HEAD
+  hooks:
+    - id: go-fmt
+    - id: go-lint
+
+- repo: git://github.com/adrienverge/yamllint
+  sha: HEAD
+  hooks:
+    - id: yamllint
