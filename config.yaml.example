@@ -3,7 +3,7 @@ host: 127.0.0.1
 port: 5432
 user: test
 password: ****
-interval: 1000
+interval: 1
 connect-timeout: 3
 idle-timeout: 300
 active-timeout: 10
