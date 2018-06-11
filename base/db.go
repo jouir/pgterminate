@@ -42,7 +42,7 @@ func (db *Db) Disconnect() {
 
 // Sessions connects to the database and returns current sessions
 func (db *Db) Sessions() (sessions []Session) {
-	query := `select pid as pid, usename as user, datname as db, host(client_addr)::text || ':' || client_port::text as client, state as state, substring(query from 1 for ` + strconv.Itoa(maxQueryLength) + `) as query, coalesce(extract(epoch from now() - backend_start), 0) as "backendDuration", coalesce(extract(epoch from now() - xact_start), 0) as "xactDuration", coalesce(extract(epoch from now() - query_start), 0) as "queryDuration" from pg_catalog.pg_stat_activity where pid <> pg_backend_pid();`
+	query := `select pid as pid, usename as user, datname as db, host(client_addr)::text || ':' || client_port::text as client, state as state, substring(query from 1 for ` + strconv.Itoa(maxQueryLength) + `) as query, coalesce(extract(epoch from now() - state_change), 0) as "stateDuration" from pg_catalog.pg_stat_activity where pid <> pg_backend_pid();`
 	rows, err := db.conn.Query(query)
 	Panic(err)
 	defer rows.Close()
@@ -50,12 +50,12 @@ func (db *Db) Sessions() (sessions []Session) {
 	for rows.Next() {
 		var pid sql.NullInt64
 		var user, db, client, state, query sql.NullString
-		var backendDuration, xactDuration, queryDuration float64
-		err := rows.Scan(&pid, &user, &db, &client, &state, &query, &backendDuration, &xactDuration, &queryDuration)
+		var stateDuration float64
+		err := rows.Scan(&pid, &user, &db, &client, &state, &query, &stateDuration)
 		Panic(err)
 
 		if pid.Valid && user.Valid && db.Valid && client.Valid && state.Valid && query.Valid {
-			sessions = append(sessions, NewSession(pid.Int64, user.String, db.String, client.String, state.String, query.String, backendDuration, xactDuration, queryDuration))
+			sessions = append(sessions, NewSession(pid.Int64, user.String, db.String, client.String, state.String, query.String, stateDuration))
 		}
 	}
 

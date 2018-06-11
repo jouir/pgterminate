@@ -67,11 +67,11 @@ func (t *Terminator) terminate() {
 }
 
 // activeSessions returns a list of active sessions
-// A session is active when state is "active" and backend has started before elapsed
+// A session is active when state is "active" and state has changed before elapsed seconds
 // seconds
 func activeSessions(sessions []base.Session, elapsed float64) (result []base.Session) {
 	for _, session := range sessions {
-		if session.State == "active" && session.QueryDuration > elapsed {
+		if session.State == "active" && session.StateDuration > elapsed {
 			result = append(result, session)
 		}
 	}
@@ -79,14 +79,11 @@ func activeSessions(sessions []base.Session, elapsed float64) (result []base.Ses
 }
 
 // idleSessions returns a list of idle sessions
-// A sessions is idle when state is "idle" and backend has started before elapsed seconds
-// and when state is "idle in transaction" or "idle in transaction (aborted)" and
-// transaction has started before elapsed seconds
+// A sessions is idle when state is "idle",  "idle in transaction" or "idle in transaction
+// (aborted)"and state has changed before elapsed seconds
 func idleSessions(sessions []base.Session, elapsed float64) (result []base.Session) {
 	for _, session := range sessions {
-		if session.State == "idle" && session.BackendDuration > elapsed {
-			result = append(result, session)
-		} else if (session.State == "idle in transaction" || session.State == "idle in transaction (aborted)") && session.XactDuration > elapsed {
+		if session.IsIdle() && session.StateDuration > elapsed {
 			result = append(result, session)
 		}
 	}
