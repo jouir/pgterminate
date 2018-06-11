@@ -4,6 +4,7 @@ import (
 	"github.com/jouir/pgterminate/base"
 	"log"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -12,6 +13,7 @@ type File struct {
 	handle   *os.File
 	name     string
 	sessions chan base.Session
+	mutex    sync.Mutex
 }
 
 // NewFile creates a file notifier
@@ -43,6 +45,8 @@ func (f *File) open() {
 
 // Reload closes and re-open the file to be compatible with logrotate
 func (f *File) Reload() {
+	f.mutex.Lock()
+	defer f.mutex.Unlock()
 	log.Println("Re-opening log file", f.name)
 	f.handle.Close()
 	f.open()
