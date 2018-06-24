@@ -10,14 +10,15 @@ type Notifier interface {
 	Reload()
 }
 
-// NewNotifier looks into Config to create a File or Console notifier and pass it
+// NewNotifier looks into Config to create a Console, File or Syslog notifier and pass it
 // the session channel for consuming sessions structs sent by terminator
 func NewNotifier(ctx *base.Context) Notifier {
-	if ctx.Config.LogFile != "" {
+	switch ctx.Config.LogDestination {
+	case "file":
 		return NewFile(ctx.Config.LogFile, ctx.Sessions)
-	}
-	if ctx.Config.SyslogFacility != "" {
+	case "syslog":
 		return NewSyslog(ctx.Config.SyslogFacility, ctx.Config.SyslogIdent, ctx.Sessions)
+	default: // console
+		return NewConsole(ctx.Sessions)
 	}
-	return NewConsole(ctx.Sessions)
 }

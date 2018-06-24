@@ -35,6 +35,7 @@ func main() {
 	flag.IntVar(&config.ConnectTimeout, "connect-timeout", 3, "Connection timeout in seconds")
 	flag.Float64Var(&config.IdleTimeout, "idle-timeout", 0, "Time for idle connections to be terminated in seconds")
 	flag.Float64Var(&config.ActiveTimeout, "active-timeout", 0, "Time for active connections to be terminated in seconds")
+	flag.StringVar(&config.LogDestination, "log-destination", "console", "Log destination between 'console', 'syslog' or 'file'")
 	flag.StringVar(&config.LogFile, "log-file", "", "Write logs to a file")
 	flag.StringVar(&config.PidFile, "pid-file", "", "Write process id into a file")
 	flag.StringVar(&config.SyslogIdent, "syslog-ident", "pgterminate", "Define syslog tag")
@@ -66,7 +67,11 @@ func main() {
 		log.Fatalln("Parameter -active-timeout or -idle-timeout required")
 	}
 
-	if config.SyslogFacility != "" {
+	if config.LogDestination != "console" && config.LogDestination != "file" && config.LogDestination != "syslog" {
+		log.Fatalln("Log destination must be 'console', 'file' or 'syslog'")
+	}
+
+	if config.LogDestination == "syslog" && config.SyslogFacility != "" {
 		matched, err := regexp.MatchString("^LOCAL[0-7]$", config.SyslogFacility)
 		base.Panic(err)
 		if !matched {

@@ -9,5 +9,6 @@ idle-timeout: 300
 active-timeout: 10
 log-file: /var/log/pgterminate/pgterminate.log
 pid-file: /var/run/pgterminate/pgterminate.pid
+#log-destination: console|file|syslog
 #syslog-ident: pgterminate
 #syslog-facility: LOCAL0

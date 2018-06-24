@@ -26,6 +26,7 @@ type Config struct {
 	ConnectTimeout int     `yaml:"connect-timeout"`
 	IdleTimeout    float64 `yaml:"idle-timeout"`
 	ActiveTimeout  float64 `yaml:"active-timeout"`
+	LogDestination string  `yaml:"log-destination"`
 	LogFile        string  `yaml:"log-file"`
 	PidFile        string  `yaml:"pid-file"`
 	SyslogIdent    string  `yaml:"syslog-ident"`
