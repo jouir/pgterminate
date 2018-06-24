@@ -2,7 +2,7 @@ package notifier
 
 import (
 	"github.com/jouir/pgterminate/base"
-	"log"
+	"github.com/jouir/pgterminate/log"
 	"os"
 	"sync"
 	"time"
@@ -26,6 +26,7 @@ func NewFile(name string, sessions chan base.Session) Notifier {
 
 // Run starts the file notifier
 func (f *File) Run() {
+	log.Info("Starting file notifier")
 	f.open()
 	defer f.terminate()
 
@@ -45,15 +46,16 @@ func (f *File) open() {
 
 // Reload closes and re-open the file to be compatible with logrotate
 func (f *File) Reload() {
+	log.Info("Reloading file notifier")
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
-	log.Println("Re-opening log file", f.name)
+	log.Debugf("Re-opening log file %s\n", f.name)
 	f.handle.Close()
 	f.open()
 }
 
 // terminate closes the file
 func (f *File) terminate() {
-	log.Println("Closing log file", f.name)
+	log.Debugf("Closing log file %s\n", f.name)
 	f.handle.Close()
 }

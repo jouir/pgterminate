@@ -2,7 +2,7 @@ package terminator
 
 import (
 	"github.com/jouir/pgterminate/base"
-	"log"
+	"github.com/jouir/pgterminate/log"
 	"time"
 )
 
@@ -26,8 +26,9 @@ func NewTerminator(ctx *base.Context) *Terminator {
 
 // Run starts the Terminator
 func (t *Terminator) Run() {
+	log.Info("Starting terminator")
 	t.db = base.NewDb(t.config.Dsn())
-	log.Println("Connecting to instance")
+	log.Info("Connecting to instance")
 	t.db.Connect()
 	defer t.terminate()
 
@@ -39,12 +40,12 @@ func (t *Terminator) Run() {
 			sessions := t.db.Sessions()
 			if t.config.ActiveTimeout != 0 {
 				actives := activeSessions(sessions, t.config.ActiveTimeout)
-				go t.terminateAndNotify(actives)
+				t.terminateAndNotify(actives)
 			}
 
 			if t.config.IdleTimeout != 0 {
 				idles := idleSessions(sessions, t.config.IdleTimeout)
-				go t.terminateAndNotify(idles)
+				t.terminateAndNotify(idles)
 			}
 			time.Sleep(time.Duration(t.config.Interval*1000) * time.Millisecond)
 		}
@@ -62,7 +63,7 @@ func (t *Terminator) terminateAndNotify(sessions []base.Session) {
 
 // terminate terminates gracefully
 func (t *Terminator) terminate() {
-	log.Println("Disconnecting from instance")
+	log.Info("Disconnecting from instance")
 	t.db.Disconnect()
 }
 

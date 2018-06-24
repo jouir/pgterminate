@@ -2,9 +2,9 @@ package base
 
 import (
 	"fmt"
+	"github.com/jouir/pgterminate/log"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"log"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -64,7 +64,7 @@ func (c *Config) Read(file string) error {
 
 // Reload reads from file and update configuration
 func (c *Config) Reload() {
-	log.Println("Reloading configuration")
+	log.Debug("Reloading configuration")
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	if c.File != "" {

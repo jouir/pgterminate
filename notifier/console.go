@@ -2,7 +2,7 @@ package notifier
 
 import (
 	"github.com/jouir/pgterminate/base"
-	"log"
+	"github.com/jouir/pgterminate/log"
 )
 
 // Console notifier structure
@@ -19,11 +19,13 @@ func NewConsole(sessions chan base.Session) Notifier {
 
 // Run starts console notifier
 func (c *Console) Run() {
+	log.Info("Starting console notifier")
 	for session := range c.sessions {
-		log.Printf("%s", session)
+		log.Infof("%s\n", session)
 	}
 }
 
 // Reload for handling SIGHUP signals
 func (c *Console) Reload() {
+	log.Info("Reloading console notifier")
 }

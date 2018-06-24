@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/jouir/pgterminate/base"
+	"github.com/jouir/pgterminate/log"
 	"github.com/jouir/pgterminate/notifier"
 	"github.com/jouir/pgterminate/terminator"
 	"golang.org/x/crypto/ssh/terminal"
-	"log"
 	"os"
 	"os/signal"
 	"regexp"
@@ -23,6 +23,9 @@ func main() {
 	var err error
 	config := base.NewConfig()
 
+	quiet := flag.Bool("quiet", false, "Quiet mode")
+	verbose := flag.Bool("verbose", false, "Verbose mode")
+	debug := flag.Bool("debug", false, "Debug mode")
 	version := flag.Bool("version", false, "Print version")
 	flag.StringVar(&config.File, "config", "", "Configuration file")
 	flag.StringVar(&config.Host, "host", "", "Instance host address")
@@ -41,6 +44,17 @@ func main() {
 	flag.StringVar(&config.SyslogIdent, "syslog-ident", "pgterminate", "Define syslog tag")
 	flag.StringVar(&config.SyslogFacility, "syslog-facility", "", "Define syslog facility from LOCAL0 to LOCAL7")
 	flag.Parse()
+
+	log.SetLevel(log.WarnLevel)
+	if *debug {
+		log.SetLevel(log.DebugLevel)
+	}
+	if *verbose {
+		log.SetLevel(log.InfoLevel)
+	}
+	if *quiet {
+		log.SetLevel(log.ErrorLevel)
+	}
 
 	if *version {
 		if AppVersion == "" {
@@ -64,18 +78,18 @@ func main() {
 	}
 
 	if config.ActiveTimeout == 0 && config.IdleTimeout == 0 {
-		log.Fatalln("Parameter -active-timeout or -idle-timeout required")
+		log.Fatal("Parameter -active-timeout or -idle-timeout required")
 	}
 
 	if config.LogDestination != "console" && config.LogDestination != "file" && config.LogDestination != "syslog" {
-		log.Fatalln("Log destination must be 'console', 'file' or 'syslog'")
+		log.Fatal("Log destination must be 'console', 'file' or 'syslog'")
 	}
 
 	if config.LogDestination == "syslog" && config.SyslogFacility != "" {
 		matched, err := regexp.MatchString("^LOCAL[0-7]$", config.SyslogFacility)
 		base.Panic(err)
 		if !matched {
-			log.Fatalln("Syslog facility must range from LOCAL0 to LOCAL7")
+			log.Fatal("Syslog facility must range from LOCAL0 to LOCAL7")
 		}
 	}
 
@@ -115,7 +129,7 @@ func handleSignals(ctx *base.Context, n notifier.Notifier) {
 	signal.Notify(c, syscall.SIGTERM)
 	go func() {
 		for sig := range c {
-			log.Printf("Received %v signal\n", sig)
+			log.Debugf("Received %v signal\n", sig)
 			close(ctx.Sessions)
 			ctx.Done <- true
 		}
@@ -126,7 +140,7 @@ func handleSignals(ctx *base.Context, n notifier.Notifier) {
 	signal.Notify(h, syscall.SIGHUP)
 	go func() {
 		for sig := range h {
-			log.Printf("Received %v signal\n", sig)
+			log.Debugf("Received %v signal\n", sig)
 			ctx.Config.Reload()
 			n.Reload()
 		}
@@ -135,7 +149,7 @@ func handleSignals(ctx *base.Context, n notifier.Notifier) {
 
 // writePid writes current pid into a pid file
 func writePid(file string) {
-	log.Println("Creating pid file", file)
+	log.Infof("Creating pid file %s", file)
 	pid := strconv.Itoa(os.Getpid())
 
 	f, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY, 0644)
@@ -149,7 +163,7 @@ func writePid(file string) {
 // removePid removes pid file
 func removePid(file string) {
 	if _, err := os.Stat(file); err == nil {
-		log.Println("Removing pid file", file)
+		log.Infof("Removing pid file %s", file)
 		err := os.Remove(file)
 		base.Panic(err)
 	}

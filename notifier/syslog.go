@@ -3,6 +3,7 @@ package notifier
 import (
 	"fmt"
 	"github.com/jouir/pgterminate/base"
+	"github.com/jouir/pgterminate/log"
 	"log/syslog"
 )
 
@@ -44,6 +45,7 @@ func NewSyslog(facility string, ident string, sessions chan base.Session) Notifi
 
 // Run starts syslog notifier
 func (s *Syslog) Run() {
+	log.Info("Starting syslog notifier")
 	var err error
 	if s.writer, err = syslog.New(s.priority, s.ident); err != nil {
 		base.Panic(err)
@@ -56,7 +58,9 @@ func (s *Syslog) Run() {
 // Reload disconnect from syslog daemon and re-connect
 // Executed when receiving SIGHUP signal
 func (s *Syslog) Reload() {
+	log.Info("Reloading syslog notifier")
 	if s.writer != nil {
+		log.Debug("Re-connecting to syslog daemon")
 		s.disconnect()
 		s.connect()
 	}

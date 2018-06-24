@@ -2,8 +2,9 @@ package base
 
 import (
 	"database/sql"
+	"fmt"
+	"github.com/jouir/pgterminate/log"
 	"github.com/lib/pq"
-	"strconv"
 )
 
 const (
@@ -42,7 +43,15 @@ func (db *Db) Disconnect() {
 
 // Sessions connects to the database and returns current sessions
 func (db *Db) Sessions() (sessions []Session) {
-	query := `select pid as pid, usename as user, datname as db, host(client_addr)::text || ':' || client_port::text as client, state as state, substring(query from 1 for ` + strconv.Itoa(maxQueryLength) + `) as query, coalesce(extract(epoch from now() - state_change), 0) as "stateDuration" from pg_catalog.pg_stat_activity where pid <> pg_backend_pid();`
+	query := fmt.Sprintf(`select pid as pid,
+	      usename as user,
+	      datname as db,
+	      host(client_addr)::text || ':' || client_port::text as client,
+	      state as state, substring(query from 1 for %d) as query,
+	      coalesce(extract(epoch from now() - state_change), 0) as "stateDuration"
+	 from pg_catalog.pg_stat_activity
+	where pid <> pg_backend_pid();`, maxQueryLength)
+	log.Debugf("query: %s\n", query)
 	rows, err := db.conn.Query(query)
 	Panic(err)
 	defer rows.Close()
@@ -70,6 +79,7 @@ func (db *Db) TerminateSessions(sessions []Session) {
 	}
 	if len(pids) > 0 {
 		query := `select pg_terminate_backend(pid) from pg_stat_activity where pid = any($1);`
+		log.Debugf("query: %s\n", query)
 		_, err := db.conn.Exec(query, pq.Array(pids))
 		Panic(err)
 	}
