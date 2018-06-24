@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"regexp"
 	"strconv"
 	"sync"
 	"syscall"
@@ -36,6 +37,8 @@ func main() {
 	flag.Float64Var(&config.ActiveTimeout, "active-timeout", 0, "Time for active connections to be terminated in seconds")
 	flag.StringVar(&config.LogFile, "log-file", "", "Write logs to a file")
 	flag.StringVar(&config.PidFile, "pid-file", "", "Write process id into a file")
+	flag.StringVar(&config.SyslogIdent, "syslog-ident", "pgterminate", "Define syslog tag")
+	flag.StringVar(&config.SyslogFacility, "syslog-facility", "", "Define syslog facility from LOCAL0 to LOCAL7")
 	flag.Parse()
 
 	if *version {
@@ -61,6 +64,14 @@ func main() {
 
 	if config.ActiveTimeout == 0 && config.IdleTimeout == 0 {
 		log.Fatalln("Parameter -active-timeout or -idle-timeout required")
+	}
+
+	if config.SyslogFacility != "" {
+		matched, err := regexp.MatchString("^LOCAL[0-7]$", config.SyslogFacility)
+		base.Panic(err)
+		if !matched {
+			log.Fatalln("Syslog facility must range from LOCAL0 to LOCAL7")
+		}
 	}
 
 	if config.PidFile != "" {

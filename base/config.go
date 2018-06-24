@@ -28,6 +28,8 @@ type Config struct {
 	ActiveTimeout  float64 `yaml:"active-timeout"`
 	LogFile        string  `yaml:"log-file"`
 	PidFile        string  `yaml:"pid-file"`
+	SyslogIdent    string  `yaml:"syslog-ident"`
+	SyslogFacility string  `yaml:"syslog-facility"`
 }
 
 func init() {

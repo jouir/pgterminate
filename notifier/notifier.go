@@ -16,5 +16,8 @@ func NewNotifier(ctx *base.Context) Notifier {
 	if ctx.Config.LogFile != "" {
 		return NewFile(ctx.Config.LogFile, ctx.Sessions)
 	}
+	if ctx.Config.SyslogFacility != "" {
+		return NewSyslog(ctx.Config.SyslogFacility, ctx.Config.SyslogIdent, ctx.Sessions)
+	}
 	return NewConsole(ctx.Sessions)
 }
