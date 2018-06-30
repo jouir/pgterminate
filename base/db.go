@@ -84,3 +84,17 @@ func (db *Db) TerminateSessions(sessions []Session) {
 		Panic(err)
 	}
 }
+
+// CancelSessions terminates current query of a list of sessions
+func (db *Db) CancelSessions(sessions []Session) {
+	var pids []int64
+	for _, session := range sessions {
+		pids = append(pids, session.Pid)
+	}
+	if len(pids) > 0 {
+		query := `select pg_cancel_backend(pid) from pg_stat_activity where pid = any($1);`
+		log.Debugf("query: %s\n", query)
+		_, err := db.conn.Exec(query, pq.Array(pids))
+		Panic(err)
+	}
+}

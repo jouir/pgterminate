@@ -38,6 +38,7 @@ type Config struct {
 	ExcludeUsers              StringFlags `yaml:"exclude-users"`
 	ExcludeUsersRegex         string      `yaml:"exclude-users-regex"`
 	ExcludeUsersRegexCompiled *regexp.Regexp
+	Cancel                    bool `yaml:"cancel"`
 }
 
 func init() {

@@ -55,7 +55,11 @@ func (t *Terminator) Run() {
 
 // terminateAndNotify terminates a list of sessions and notifies channel
 func (t *Terminator) terminateAndNotify(sessions []base.Session) {
-	t.db.TerminateSessions(sessions)
+	if t.config.Cancel {
+		t.db.CancelSessions(sessions)
+	} else {
+		t.db.TerminateSessions(sessions)
+	}
 	for _, session := range sessions {
 		t.sessions <- session
 	}
