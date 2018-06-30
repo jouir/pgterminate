@@ -13,7 +13,7 @@ With `pgterminate`, you shouldn't be paged at night because some queries has loc
 * at least one of `active-timeout` and `idle-timeout` parameter is required, both can be used.
 * `pgterminate` relies on `libpq` for PostgreSQL connection. When `-host` is ommited, connection via unix socket is used. When `-user` is ommited, the unix user is used. And so on.
 * time parameters, like `connect-timeout`, `active-timeout`, `idle-timeout` and `interval`, are represented in seconds. They accept float value except for `connect-timeout` which is an integer.
-* if you want `pgterminate` to terminate any session, ensure it has SUPERUSER privileges.
+* if you want `pgterminate` to terminate any session, ensure it has SUPERUSER privileges. Since 9.6, grant `pg_signal_backend` role for terminating all sessions except superusers.
 
 # Internals
 
