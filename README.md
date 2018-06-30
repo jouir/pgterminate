@@ -91,4 +91,4 @@ When include users list or regex is set, `pgterminate` will focus on included us
 When exclude users list or regex is set and no include option is set, `pgterminate` will terminate all sessions except excluded users.
 
 # License
-`pgterminate` is released under [The Unlicense](https://github.com/jouir/pgterminate/blob/master/LICENSE) license. Code is under public domain.
+`pgterminate` is released under [The Unlicense](LICENSE) license. Code is under public domain.
