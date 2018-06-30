@@ -6,6 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 )
@@ -15,22 +16,28 @@ var AppName string
 
 // Config receives configuration options
 type Config struct {
-	mutex          sync.Mutex
-	File           string
-	Host           string  `yaml:"host"`
-	Port           int     `yaml:"port"`
-	User           string  `yaml:"user"`
-	Password       string  `yaml:"password"`
-	Database       string  `yaml:"database"`
-	Interval       float64 `yaml:"interval"`
-	ConnectTimeout int     `yaml:"connect-timeout"`
-	IdleTimeout    float64 `yaml:"idle-timeout"`
-	ActiveTimeout  float64 `yaml:"active-timeout"`
-	LogDestination string  `yaml:"log-destination"`
-	LogFile        string  `yaml:"log-file"`
-	PidFile        string  `yaml:"pid-file"`
-	SyslogIdent    string  `yaml:"syslog-ident"`
-	SyslogFacility string  `yaml:"syslog-facility"`
+	mutex                     sync.Mutex
+	File                      string
+	Host                      string      `yaml:"host"`
+	Port                      int         `yaml:"port"`
+	User                      string      `yaml:"user"`
+	Password                  string      `yaml:"password"`
+	Database                  string      `yaml:"database"`
+	Interval                  float64     `yaml:"interval"`
+	ConnectTimeout            int         `yaml:"connect-timeout"`
+	IdleTimeout               float64     `yaml:"idle-timeout"`
+	ActiveTimeout             float64     `yaml:"active-timeout"`
+	LogDestination            string      `yaml:"log-destination"`
+	LogFile                   string      `yaml:"log-file"`
+	PidFile                   string      `yaml:"pid-file"`
+	SyslogIdent               string      `yaml:"syslog-ident"`
+	SyslogFacility            string      `yaml:"syslog-facility"`
+	IncludeUsers              StringFlags `yaml:"include-users"`
+	IncludeUsersRegex         string      `yaml:"include-users-regex"`
+	IncludeUsersRegexCompiled *regexp.Regexp
+	ExcludeUsers              StringFlags `yaml:"exclude-users"`
+	ExcludeUsersRegex         string      `yaml:"exclude-users-regex"`
+	ExcludeUsersRegexCompiled *regexp.Regexp
 }
 
 func init() {
@@ -62,7 +69,7 @@ func (c *Config) Read(file string) error {
 	return nil
 }
 
-// Reload reads from file and update configuration
+// Reload reads from file to update configuration and re-compile regexes
 func (c *Config) Reload() {
 	log.Debug("Reloading configuration")
 	c.mutex.Lock()
@@ -70,6 +77,8 @@ func (c *Config) Reload() {
 	if c.File != "" {
 		c.Read(c.File)
 	}
+	err := c.CompileRegexes()
+	Panic(err)
 }
 
 // Dsn formats a connection string based on Config
@@ -97,4 +106,35 @@ func (c *Config) Dsn() string {
 		parameters = append(parameters, fmt.Sprintf("application_name=%s", AppName))
 	}
 	return strings.Join(parameters, " ")
+}
+
+// CompileRegexes transforms regexes from string to regexp instance
+func (c *Config) CompileRegexes() (err error) {
+	if c.IncludeUsersRegex != "" {
+		c.IncludeUsersRegexCompiled, err = regexp.Compile(c.IncludeUsersRegex)
+		if err != nil {
+			return err
+		}
+	}
+	if c.ExcludeUsersRegex != "" {
+		c.ExcludeUsersRegexCompiled, err = regexp.Compile(c.ExcludeUsersRegex)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// StringFlags append multiple string flags into a string slice
+type StringFlags []string
+
+// String for implementing flag interface
+func (s *StringFlags) String() string {
+	return "multiple strings flag"
+}
+
+// Set adds alues into the slice
+func (s *StringFlags) Set(value string) error {
+	*s = append(*s, value)
+	return nil
 }

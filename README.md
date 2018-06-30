@@ -47,5 +47,47 @@ Print usage:
 pgterminate -help
 ```
 
+# Filtering users
+
+`pgterminate` is able to include or exclude users from being terminated.
+
+## Configuration
+### List
+Arguments `-include-user` or `-exclude-user` can be used multiple times for multiple users:
+
+```
+pgterminate -include-user user1 -include-user user2
+```
+Or in configuration file:
+
+```
+include-users:
+  user1
+  user2
+```
+Same applies for `-exclude-user` (argument) and `exclude-users` (file).
+
+### Regexes
+Regexes can be configured:
+
+```
+pgterminate -include-users-regex "(user1|user2)"
+```
+Or in configuration file:
+
+```
+include-users-regex: "(user1|user2)"
+```
+
+Same applies for `-exclude-users-regex` (argument) and `exclude-users-regex` (file).
+
+## Include users
+
+When include users list or regex is set, `pgterminate` will focus on included users only. It could terminate excluded users if any. If you want to exclude users, use exclude options only.
+
+## Exclude users
+
+When exclude users list or regex is set and no include option is set, `pgterminate` will terminate all sessions except excluded users.
+
 # License
 `pgterminate` is released under [The Unlicense](https://github.com/jouir/pgterminate/blob/master/LICENSE) license. Code is under public domain.

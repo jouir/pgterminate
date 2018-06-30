@@ -43,6 +43,10 @@ func main() {
 	flag.StringVar(&config.PidFile, "pid-file", "", "Write process id into a file")
 	flag.StringVar(&config.SyslogIdent, "syslog-ident", "pgterminate", "Define syslog tag")
 	flag.StringVar(&config.SyslogFacility, "syslog-facility", "", "Define syslog facility from LOCAL0 to LOCAL7")
+	flag.Var(&config.IncludeUsers, "include-user", "Terminate only this user (can be called multiple times)")
+	flag.StringVar(&config.IncludeUsersRegex, "include-users-regex", "", "Terminate users matching this regexp")
+	flag.Var(&config.ExcludeUsers, "exclude-user", "Ignore this user (can be called multiple times)")
+	flag.StringVar(&config.ExcludeUsersRegex, "exclude-users-regex", "", "Ignore users matching this regexp")
 	flag.Parse()
 
 	log.SetLevel(log.WarnLevel)
@@ -92,6 +96,9 @@ func main() {
 			log.Fatal("Syslog facility must range from LOCAL0 to LOCAL7")
 		}
 	}
+
+	err = config.CompileRegexes()
+	base.Panic(err)
 
 	if config.PidFile != "" {
 		writePid(config.PidFile)

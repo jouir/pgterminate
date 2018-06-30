@@ -12,3 +12,11 @@ pid-file: /var/run/pgterminate/pgterminate.pid
 #log-destination: console|file|syslog
 #syslog-ident: pgterminate
 #syslog-facility: LOCAL0
+#include-users:
+#    user1
+#    user2
+#include-users-regex: "(user1|user2)"
+#exclude-users:
+#    user1
+#    user2
+#exclude-users-regex: "(user1|user2)"

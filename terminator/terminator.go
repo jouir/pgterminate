@@ -40,12 +40,12 @@ func (t *Terminator) Run() {
 			sessions := t.db.Sessions()
 			if t.config.ActiveTimeout != 0 {
 				actives := activeSessions(sessions, t.config.ActiveTimeout)
-				t.terminateAndNotify(actives)
+				t.terminateAndNotify(t.filter(actives))
 			}
 
 			if t.config.IdleTimeout != 0 {
 				idles := idleSessions(sessions, t.config.IdleTimeout)
-				t.terminateAndNotify(idles)
+				t.terminateAndNotify(t.filter(idles))
 			}
 			time.Sleep(time.Duration(t.config.Interval*1000) * time.Millisecond)
 		}
@@ -59,6 +59,30 @@ func (t *Terminator) terminateAndNotify(sessions []base.Session) {
 	for _, session := range sessions {
 		t.sessions <- session
 	}
+}
+
+// filter removes sessions according to include and exclude users settings
+// when include users slice and regex are not set, append all sessions except excluded users
+// otherwise, append included users
+func (t *Terminator) filter(sessions []base.Session) (filtered []base.Session) {
+	includeUsers, includeRegex := t.config.IncludeUsers, t.config.IncludeUsersRegexCompiled
+	excludeUsers, excludeRegex := t.config.ExcludeUsers, t.config.ExcludeUsersRegexCompiled
+
+	for _, session := range sessions {
+		if t.config.IncludeUsers == nil && includeRegex == nil {
+			// append all sessions except excluded users
+			if !base.InSlice(session.User, excludeUsers) || (excludeRegex != nil && !excludeRegex.MatchString(session.User)) {
+				filtered = append(filtered, session)
+			}
+		} else {
+			// append included users only
+			if base.InSlice(session.User, includeUsers) || (includeRegex != nil && includeRegex.MatchString(session.User)) {
+				filtered = append(filtered, session)
+			}
+		}
+	}
+
+	return filtered
 }
 
 // terminate terminates gracefully
