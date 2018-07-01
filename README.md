@@ -8,7 +8,7 @@ With `pgterminate`, you shouldn't be paged at night because some queries has loc
 # Highlights
 * `pgterminate` name is derived from `pg_terminate_backend` function, it terminates backends.
 * backends are called sessions in `pgterminate`.
-* use `cancel` option to terminate query instead of session.
+* `cancel` option terminate current query of active sessions instead of ending the whole backend. Idle sessions are terminated even with this option enabled because `pg_cancel_backend` function has no effect on them.
 * `active` sessions are backends in `active` state for more than `active-timeout` seconds.
 * `idle` sessions are backends in `idle`, `idle in transaction` or `idle in transaction (abort)` state for more than `idle-timeout` seconds.
 * at least one of `active-timeout` and `idle-timeout` parameter is required, both can be used.

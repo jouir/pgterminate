@@ -38,28 +38,33 @@ func (t *Terminator) Run() {
 			return
 		default:
 			sessions := t.db.Sessions()
+
+			// Cancel or terminate active sessions
 			if t.config.ActiveTimeout != 0 {
-				actives := activeSessions(sessions, t.config.ActiveTimeout)
-				t.terminateAndNotify(t.filter(actives))
+				actives := t.filter(activeSessions(sessions, t.config.ActiveTimeout))
+				if t.config.Cancel {
+					t.db.CancelSessions(actives)
+				} else {
+					t.db.TerminateSessions(actives)
+				}
+				t.notify(actives)
 			}
 
+			// Terminate idle sessions
 			if t.config.IdleTimeout != 0 {
-				idles := idleSessions(sessions, t.config.IdleTimeout)
-				t.terminateAndNotify(t.filter(idles))
+				idles := t.filter(idleSessions(sessions, t.config.IdleTimeout))
+				t.db.TerminateSessions(idles)
+				t.notify(idles)
 			}
+
 			time.Sleep(time.Duration(t.config.Interval*1000) * time.Millisecond)
 		}
 
 	}
 }
 
-// terminateAndNotify terminates a list of sessions and notifies channel
-func (t *Terminator) terminateAndNotify(sessions []base.Session) {
-	if t.config.Cancel {
-		t.db.CancelSessions(sessions)
-	} else {
-		t.db.TerminateSessions(sessions)
-	}
+// notify sends sessions to channel
+func (t *Terminator) notify(sessions []base.Session) {
 	for _, session := range sessions {
 		t.sessions <- session
 	}
