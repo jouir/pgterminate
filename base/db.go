@@ -46,7 +46,7 @@ func (db *Db) Sessions() (sessions []Session) {
 	query := fmt.Sprintf(`select pid as pid,
 	      usename as user,
 	      datname as db,
-	      host(client_addr)::text || ':' || client_port::text as client,
+	      coalesce(host(client_addr)::text || ':' || client_port::text, 'localhost') as client,
 	      state as state, substring(query from 1 for %d) as query,
 	      coalesce(extract(epoch from now() - state_change), 0) as "stateDuration"
 	 from pg_catalog.pg_stat_activity
