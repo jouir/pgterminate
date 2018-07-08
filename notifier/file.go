@@ -12,12 +12,12 @@ import (
 type File struct {
 	handle   *os.File
 	name     string
-	sessions chan base.Session
+	sessions chan *base.Session
 	mutex    sync.Mutex
 }
 
 // NewFile creates a file notifier
-func NewFile(name string, sessions chan base.Session) Notifier {
+func NewFile(name string, sessions chan *base.Session) Notifier {
 	return &File{
 		name:     name,
 		sessions: sessions,

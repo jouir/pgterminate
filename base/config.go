@@ -38,6 +38,7 @@ type Config struct {
 	ExcludeUsers              StringFlags `yaml:"exclude-users"`
 	ExcludeUsersRegex         string      `yaml:"exclude-users-regex"`
 	ExcludeUsersRegexCompiled *regexp.Regexp
+	ExcludeListeners          bool `yaml:"exclude-listeners"`
 	Cancel                    bool `yaml:"cancel"`
 }
 

@@ -42,7 +42,7 @@ func (db *Db) Disconnect() {
 }
 
 // Sessions connects to the database and returns current sessions
-func (db *Db) Sessions() (sessions []Session) {
+func (db *Db) Sessions() (sessions []*Session) {
 	query := fmt.Sprintf(`select pid as pid,
 	      usename as user,
 	      datname as db,
@@ -72,7 +72,7 @@ func (db *Db) Sessions() (sessions []Session) {
 }
 
 // TerminateSessions terminates a list of sessions
-func (db *Db) TerminateSessions(sessions []Session) {
+func (db *Db) TerminateSessions(sessions []*Session) {
 	var pids []int64
 	for _, session := range sessions {
 		pids = append(pids, session.Pid)
@@ -86,7 +86,7 @@ func (db *Db) TerminateSessions(sessions []Session) {
 }
 
 // CancelSessions terminates current query of a list of sessions
-func (db *Db) CancelSessions(sessions []Session) {
+func (db *Db) CancelSessions(sessions []*Session) {
 	var pids []int64
 	for _, session := range sessions {
 		pids = append(pids, session.Pid)

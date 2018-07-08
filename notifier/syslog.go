@@ -9,14 +9,14 @@ import (
 
 // Syslog notifier
 type Syslog struct {
-	sessions chan base.Session
+	sessions chan *base.Session
 	ident    string
 	priority syslog.Priority
 	writer   *syslog.Writer
 }
 
 // NewSyslog creates a syslog notifier
-func NewSyslog(facility string, ident string, sessions chan base.Session) Notifier {
+func NewSyslog(facility string, ident string, sessions chan *base.Session) Notifier {
 	var priority syslog.Priority
 	switch facility {
 	case "LOCAL0":

@@ -90,5 +90,9 @@ When include users list or regex is set, `pgterminate` will focus on included us
 
 When exclude users list or regex is set and no include option is set, `pgterminate` will terminate all sessions except excluded users.
 
+# Listeners
+
+LISTEN queries are asynchronous. Sessions are set to "idle" state even if they are waiting for messages to be sent to the queue. `pgterminate` can exclude sessions in that state by looking at the last known query starting with "LISTEN", with the `exclude-listeners` parameter.
+
 # License
 `pgterminate` is released under [The Unlicense](LICENSE) license. Code is under public domain.

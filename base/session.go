@@ -17,8 +17,8 @@ type Session struct {
 }
 
 // NewSession instanciates a Session
-func NewSession(pid int64, user string, db string, client string, state string, query string, stateDuration float64) Session {
-	return Session{
+func NewSession(pid int64, user string, db string, client string, state string, query string, stateDuration float64) *Session {
+	return &Session{
 		Pid:           pid,
 		User:          user,
 		Db:            db,
@@ -30,7 +30,7 @@ func NewSession(pid int64, user string, db string, client string, state string, 
 }
 
 // String represents a Session as a string
-func (s Session) String() string {
+func (s *Session) String() string {
 	var output []string
 	if s.Pid != 0 {
 		output = append(output, fmt.Sprintf("pid=%d", s.Pid))
@@ -57,7 +57,7 @@ func (s Session) String() string {
 }
 
 // IsIdle returns true when a session is doing nothing
-func (s Session) IsIdle() bool {
+func (s *Session) IsIdle() bool {
 	if s.State == "idle" || s.State == "idle in transaction" || s.State == "idle in transaction (aborted)" {
 		return true
 	}

@@ -7,11 +7,11 @@ import (
 
 // Console notifier structure
 type Console struct {
-	sessions chan base.Session
+	sessions chan *base.Session
 }
 
 // NewConsole creates a console notifier
-func NewConsole(sessions chan base.Session) Notifier {
+func NewConsole(sessions chan *base.Session) Notifier {
 	return &Console{
 		sessions: sessions,
 	}

@@ -47,6 +47,7 @@ func main() {
 	flag.StringVar(&config.IncludeUsersRegex, "include-users-regex", "", "Terminate users matching this regexp")
 	flag.Var(&config.ExcludeUsers, "exclude-user", "Ignore this user (can be called multiple times)")
 	flag.StringVar(&config.ExcludeUsersRegex, "exclude-users-regex", "", "Ignore users matching this regexp")
+	flag.BoolVar(&config.ExcludeListeners, "exclude-listeners", false, "Ignore sessions listening for events")
 	flag.BoolVar(&config.Cancel, "cancel", false, "Cancel sessions instead of terminate")
 	flag.Parse()
 
@@ -107,7 +108,7 @@ func main() {
 	}
 
 	done := make(chan bool)
-	sessions := make(chan base.Session)
+	sessions := make(chan *base.Session)
 
 	ctx := base.NewContext(config, sessions, done)
 	terminator := terminator.NewTerminator(ctx)
