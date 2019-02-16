@@ -104,6 +104,7 @@ The following placeholders are available to format log messages using `log-forma
 * `%s`: state
 * `%m`: state duration
 * `%q`: query
+* `%a`: application name
 
 # License
 `pgterminate` is released under [The Unlicense](LICENSE) license. Code is under public domain.

@@ -7,25 +7,27 @@ import (
 
 // Session represents a PostgreSQL backend
 type Session struct {
-	Pid           int64
-	User          string
-	Db            string
-	Client        string
-	State         string
-	Query         string
-	StateDuration float64
+	Pid             int64
+	User            string
+	Db              string
+	Client          string
+	State           string
+	Query           string
+	StateDuration   float64
+	ApplicationName string
 }
 
 // NewSession instanciates a Session
-func NewSession(pid int64, user string, db string, client string, state string, query string, stateDuration float64) *Session {
+func NewSession(pid int64, user string, db string, client string, state string, query string, stateDuration float64, applicationName string) *Session {
 	return &Session{
-		Pid:           pid,
-		User:          user,
-		Db:            db,
-		Client:        client,
-		State:         state,
-		Query:         query,
-		StateDuration: stateDuration,
+		Pid:             pid,
+		User:            user,
+		Db:              db,
+		Client:          client,
+		State:           state,
+		Query:           query,
+		StateDuration:   stateDuration,
+		ApplicationName: applicationName,
 	}
 }
 
@@ -39,6 +41,7 @@ func (s *Session) Format(format string) string {
 		"%s": s.State,
 		"%m": fmt.Sprintf("%f", s.StateDuration),
 		"%q": s.Query,
+		"%a": s.ApplicationName,
 	}
 
 	output := format

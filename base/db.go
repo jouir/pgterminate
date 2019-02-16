@@ -3,6 +3,7 @@ package base
 import (
 	"database/sql"
 	"fmt"
+
 	"github.com/jouir/pgterminate/log"
 	"github.com/lib/pq"
 )
@@ -48,7 +49,8 @@ func (db *Db) Sessions() (sessions []*Session) {
 	      datname as db,
 	      coalesce(host(client_addr)::text || ':' || client_port::text, 'localhost') as client,
 	      state as state, substring(query from 1 for %d) as query,
-	      coalesce(extract(epoch from now() - state_change), 0) as "stateDuration"
+		  coalesce(extract(epoch from now() - state_change), 0) as "stateDuration",
+		  application_name as "applicationName"
 	 from pg_catalog.pg_stat_activity
 	where pid <> pg_backend_pid();`, maxQueryLength)
 	log.Debugf("query: %s\n", query)
@@ -58,13 +60,13 @@ func (db *Db) Sessions() (sessions []*Session) {
 
 	for rows.Next() {
 		var pid sql.NullInt64
-		var user, db, client, state, query sql.NullString
+		var user, db, client, state, query, applicationName sql.NullString
 		var stateDuration float64
-		err := rows.Scan(&pid, &user, &db, &client, &state, &query, &stateDuration)
+		err := rows.Scan(&pid, &user, &db, &client, &state, &query, &stateDuration, &applicationName)
 		Panic(err)
 
-		if pid.Valid && user.Valid && db.Valid && client.Valid && state.Valid && query.Valid {
-			sessions = append(sessions, NewSession(pid.Int64, user.String, db.String, client.String, state.String, query.String, stateDuration))
+		if pid.Valid && user.Valid && db.Valid && client.Valid && state.Valid && query.Valid && applicationName.Valid {
+			sessions = append(sessions, NewSession(pid.Int64, user.String, db.String, client.String, state.String, query.String, stateDuration, applicationName.String))
 		}
 	}
 
