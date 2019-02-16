@@ -1,22 +1,23 @@
 package notifier
 
 import (
-	"fmt"
+	"log/syslog"
+
 	"github.com/jouir/pgterminate/base"
 	"github.com/jouir/pgterminate/log"
-	"log/syslog"
 )
 
 // Syslog notifier
 type Syslog struct {
 	sessions chan *base.Session
 	ident    string
+	format   string
 	priority syslog.Priority
 	writer   *syslog.Writer
 }
 
 // NewSyslog creates a syslog notifier
-func NewSyslog(facility string, ident string, sessions chan *base.Session) Notifier {
+func NewSyslog(facility string, ident string, format string, sessions chan *base.Session) Notifier {
 	var priority syslog.Priority
 	switch facility {
 	case "LOCAL0":
@@ -40,6 +41,7 @@ func NewSyslog(facility string, ident string, sessions chan *base.Session) Notif
 		sessions: sessions,
 		ident:    ident,
 		priority: priority,
+		format:   format,
 	}
 }
 
@@ -51,7 +53,7 @@ func (s *Syslog) Run() {
 		base.Panic(err)
 	}
 	for session := range s.sessions {
-		s.writer.Info(fmt.Sprintf("%s", session))
+		s.writer.Info(session.Format(s.format))
 	}
 }
 

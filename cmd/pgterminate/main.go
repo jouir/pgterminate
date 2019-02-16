@@ -3,17 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/jouir/pgterminate/base"
-	"github.com/jouir/pgterminate/log"
-	"github.com/jouir/pgterminate/notifier"
-	"github.com/jouir/pgterminate/terminator"
-	"golang.org/x/crypto/ssh/terminal"
 	"os"
 	"os/signal"
 	"regexp"
 	"strconv"
 	"sync"
 	"syscall"
+
+	"github.com/jouir/pgterminate/base"
+	"github.com/jouir/pgterminate/log"
+	"github.com/jouir/pgterminate/notifier"
+	"github.com/jouir/pgterminate/terminator"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 // AppVersion stores application version at compilation time
@@ -40,6 +41,7 @@ func main() {
 	flag.Float64Var(&config.ActiveTimeout, "active-timeout", 0, "Time for active connections to be terminated in seconds")
 	flag.StringVar(&config.LogDestination, "log-destination", "console", "Log destination between 'console', 'syslog' or 'file'")
 	flag.StringVar(&config.LogFile, "log-file", "", "Write logs to a file")
+	flag.StringVar(&config.LogFormat, "log-format", "pid=%p user=%u db=%d client=%r state=%s state_duration=%m query=%q", "Represent messages using this format")
 	flag.StringVar(&config.PidFile, "pid-file", "", "Write process id into a file")
 	flag.StringVar(&config.SyslogIdent, "syslog-ident", "pgterminate", "Define syslog tag")
 	flag.StringVar(&config.SyslogFacility, "syslog-facility", "", "Define syslog facility from LOCAL0 to LOCAL7")

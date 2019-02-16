@@ -1,25 +1,28 @@
 package notifier
 
 import (
-	"github.com/jouir/pgterminate/base"
-	"github.com/jouir/pgterminate/log"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/jouir/pgterminate/base"
+	"github.com/jouir/pgterminate/log"
 )
 
 // File structure for file notifier
 type File struct {
 	handle   *os.File
+	format   string
 	name     string
 	sessions chan *base.Session
 	mutex    sync.Mutex
 }
 
 // NewFile creates a file notifier
-func NewFile(name string, sessions chan *base.Session) Notifier {
+func NewFile(format string, name string, sessions chan *base.Session) Notifier {
 	return &File{
 		name:     name,
+		format:   format,
 		sessions: sessions,
 	}
 }
@@ -32,7 +35,7 @@ func (f *File) Run() {
 
 	for session := range f.sessions {
 		timestamp := time.Now().Format(time.RFC3339)
-		_, err := f.handle.WriteString(timestamp + " " + session.String() + "\n")
+		_, err := f.handle.WriteString(timestamp + " " + session.Format(f.format) + "\n")
 		base.Panic(err)
 	}
 }

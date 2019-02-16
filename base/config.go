@@ -2,13 +2,14 @@ package base
 
 import (
 	"fmt"
-	"github.com/jouir/pgterminate/log"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
+
+	"github.com/jouir/pgterminate/log"
+	"gopkg.in/yaml.v2"
 )
 
 // AppName exposes application name to config module
@@ -29,6 +30,7 @@ type Config struct {
 	ActiveTimeout             float64     `yaml:"active-timeout"`
 	LogDestination            string      `yaml:"log-destination"`
 	LogFile                   string      `yaml:"log-file"`
+	LogFormat                 string      `yaml:"log-format"`
 	PidFile                   string      `yaml:"pid-file"`
 	SyslogIdent               string      `yaml:"syslog-ident"`
 	SyslogFacility            string      `yaml:"syslog-facility"`

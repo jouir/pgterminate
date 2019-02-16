@@ -15,10 +15,10 @@ type Notifier interface {
 func NewNotifier(ctx *base.Context) Notifier {
 	switch ctx.Config.LogDestination {
 	case "file":
-		return NewFile(ctx.Config.LogFile, ctx.Sessions)
+		return NewFile(ctx.Config.LogFile, ctx.Config.LogFormat, ctx.Sessions)
 	case "syslog":
-		return NewSyslog(ctx.Config.SyslogFacility, ctx.Config.SyslogIdent, ctx.Sessions)
+		return NewSyslog(ctx.Config.SyslogFacility, ctx.Config.SyslogIdent, ctx.Config.LogFormat, ctx.Sessions)
 	default: // console
-		return NewConsole(ctx.Sessions)
+		return NewConsole(ctx.Config.LogFormat, ctx.Sessions)
 	}
 }

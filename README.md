@@ -94,5 +94,16 @@ When exclude users list or regex is set and no include option is set, `pgtermina
 
 LISTEN queries are asynchronous. Sessions are set to "idle" state even if they are waiting for messages to be sent to the queue. `pgterminate` can exclude sessions in that state by looking at the last known query starting with "LISTEN", with the `exclude-listeners` parameter.
 
+# Log format
+
+The following placeholders are available to format log messages using `log-format` option:
+* `%p`: pid
+* `%u`: username
+* `%d`: database name
+* `%r`: client (host:port)
+* `%s`: state
+* `%m`: state duration
+* `%q`: query
+
 # License
 `pgterminate` is released under [The Unlicense](LICENSE) license. Code is under public domain.

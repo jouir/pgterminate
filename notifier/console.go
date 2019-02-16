@@ -7,12 +7,14 @@ import (
 
 // Console notifier structure
 type Console struct {
+	format   string
 	sessions chan *base.Session
 }
 
 // NewConsole creates a console notifier
-func NewConsole(sessions chan *base.Session) Notifier {
+func NewConsole(format string, sessions chan *base.Session) Notifier {
 	return &Console{
+		format:   format,
 		sessions: sessions,
 	}
 }
@@ -21,7 +23,7 @@ func NewConsole(sessions chan *base.Session) Notifier {
 func (c *Console) Run() {
 	log.Info("Starting console notifier")
 	for session := range c.sessions {
-		log.Infof("%s\n", session)
+		log.Info(session.Format(c.format))
 	}
 }
 

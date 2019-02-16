@@ -29,31 +29,25 @@ func NewSession(pid int64, user string, db string, client string, state string, 
 	}
 }
 
-// String represents a Session as a string
-func (s *Session) String() string {
-	var output []string
-	if s.Pid != 0 {
-		output = append(output, fmt.Sprintf("pid=%d", s.Pid))
+// Format returns a Session as a string by replacing placeholders with their respective value
+func (s *Session) Format(format string) string {
+	definitions := map[string]string{
+		"%p": fmt.Sprintf("%d", s.Pid),
+		"%u": s.User,
+		"%d": s.Db,
+		"%r": s.Client,
+		"%s": s.State,
+		"%m": fmt.Sprintf("%f", s.StateDuration),
+		"%q": s.Query,
 	}
-	if s.User != "" {
-		output = append(output, fmt.Sprintf("user=%s", s.User))
+
+	output := format
+
+	for placeholder, value := range definitions {
+		output = strings.Replace(output, placeholder, value, -1)
 	}
-	if s.Db != "" {
-		output = append(output, fmt.Sprintf("db=%s", s.Db))
-	}
-	if s.Client != "" {
-		output = append(output, fmt.Sprintf("client=%s", s.Client))
-	}
-	if s.State != "" {
-		output = append(output, fmt.Sprintf("state=%s", s.State))
-	}
-	if s.StateDuration != 0 {
-		output = append(output, fmt.Sprintf("state_duration=%f", s.StateDuration))
-	}
-	if s.Query != "" && !s.IsIdle() {
-		output = append(output, fmt.Sprintf("query=%s", s.Query))
-	}
-	return strings.Join(output, " ")
+
+	return output
 }
 
 // IsIdle returns true when a session is doing nothing
