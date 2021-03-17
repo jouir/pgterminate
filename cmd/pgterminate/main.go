@@ -20,6 +20,15 @@ import (
 // AppVersion stores application version at compilation time
 var AppVersion string
 
+// AppName to store application name
+var AppName string = "pgterminate"
+
+// GitCommit to set git commit at compilation time (can be empty)
+var GitCommit string
+
+// GoVersion to set Go version at compilation time
+var GoVersion string
+
 func main() {
 	var err error
 	config := base.NewConfig()
@@ -68,7 +77,7 @@ func main() {
 		if AppVersion == "" {
 			AppVersion = "unknown"
 		}
-		fmt.Println(AppVersion)
+		showVersion()
 		return
 	}
 
@@ -178,4 +187,11 @@ func removePid(file string) {
 		err := os.Remove(file)
 		base.Panic(err)
 	}
+}
+
+func showVersion() {
+	if GitCommit != "" {
+		AppVersion = fmt.Sprintf("%s-%s", AppVersion, GitCommit)
+	}
+	fmt.Printf("%s version %s (compiled with %s)\n", AppName, AppVersion, GoVersion)
 }

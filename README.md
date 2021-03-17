@@ -30,6 +30,23 @@ There's two ways to configure `pgterminate`:
 
 Configuration file options **override** command-line arguments
 
+# Build
+
+Create binary:
+```
+make
+```
+
+Create release tarball:
+```
+make release
+```
+
+Cleanup:
+```
+make clean
+```
+
 # Usage
 Connect to a remote instance and prompt for password:
 ```
