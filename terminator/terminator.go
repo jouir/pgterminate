@@ -81,7 +81,7 @@ func (t *Terminator) filterUsers(sessions []*base.Session) (filtered []*base.Ses
 	for _, session := range sessions {
 		if t.config.IncludeUsers == nil && includeRegex == nil {
 			// append all sessions except excluded users
-			if !base.InSlice(session.User, excludeUsers) || (excludeRegex != nil && !excludeRegex.MatchString(session.User)) {
+			if !base.InSlice(session.User, excludeUsers) && (excludeRegex != nil && !excludeRegex.MatchString(session.User)) {
 				filtered = append(filtered, session)
 			}
 		} else {
