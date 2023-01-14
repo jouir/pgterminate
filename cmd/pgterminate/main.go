@@ -58,6 +58,10 @@ func main() {
 	flag.StringVar(&config.IncludeUsersRegex, "include-users-regex", "", "Terminate users matching this regexp")
 	flag.Var(&config.ExcludeUsers, "exclude-user", "Ignore this user (can be called multiple times)")
 	flag.StringVar(&config.ExcludeUsersRegex, "exclude-users-regex", "", "Ignore users matching this regexp")
+	flag.Var(&config.IncludeDatabases, "include-database", "Terminate only this database (can be called multiple times)")
+	flag.StringVar(&config.IncludeDatabasesRegex, "include-databases-regex", "", "Terminate databases matching this regexp")
+	flag.Var(&config.ExcludeDatabases, "exclude-database", "Ignore this database (can be called multiple times)")
+	flag.StringVar(&config.ExcludeDatabasesRegex, "exclude-databases-regex", "", "Ignore databases matching this regexp")
 	flag.BoolVar(&config.ExcludeListeners, "exclude-listeners", false, "Ignore sessions listening for events")
 	flag.BoolVar(&config.Cancel, "cancel", false, "Cancel sessions instead of terminate")
 	flag.Parse()
@@ -112,6 +116,7 @@ func main() {
 
 	err = config.CompileRegexes()
 	base.Panic(err)
+	config.CompileFilters()
 
 	if config.PidFile != "" {
 		writePid(config.PidFile)

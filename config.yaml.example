@@ -21,4 +21,12 @@
 #    user1
 #    user2
 #exclude-users-regex: "(user1|user2)"
+#include-databases:
+#    db1
+#    db2
+#include-databases-regex: "(db1|db2)"
+#exclude-databases:
+#    db1
+#    db2
+#exclude-databases-regex: "(db1|db2)"
 #cancel

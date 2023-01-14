@@ -15,5 +15,9 @@ release:
 	go build -ldflags "${LDFLAGS}" -o bin/${BINARY} cmd/${BINARY}/main.go
 	(cd bin && tar czf ${BINARY}-${APPVERSION}-${GOOS}-${GOARCH}.tar.gz ${BINARY})
 
+test:
+	go test base/*
+	go test terminator/*
+
 clean:
 	rm -rf bin

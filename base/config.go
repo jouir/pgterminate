@@ -17,31 +17,41 @@ var AppName string
 
 // Config receives configuration options
 type Config struct {
-	mutex                     sync.Mutex
-	File                      string
-	Host                      string      `yaml:"host"`
-	Port                      int         `yaml:"port"`
-	User                      string      `yaml:"user"`
-	Password                  string      `yaml:"password"`
-	Database                  string      `yaml:"database"`
-	Interval                  float64     `yaml:"interval"`
-	ConnectTimeout            int         `yaml:"connect-timeout"`
-	IdleTimeout               float64     `yaml:"idle-timeout"`
-	ActiveTimeout             float64     `yaml:"active-timeout"`
-	LogDestination            string      `yaml:"log-destination"`
-	LogFile                   string      `yaml:"log-file"`
-	LogFormat                 string      `yaml:"log-format"`
-	PidFile                   string      `yaml:"pid-file"`
-	SyslogIdent               string      `yaml:"syslog-ident"`
-	SyslogFacility            string      `yaml:"syslog-facility"`
-	IncludeUsers              StringFlags `yaml:"include-users"`
-	IncludeUsersRegex         string      `yaml:"include-users-regex"`
-	IncludeUsersRegexCompiled *regexp.Regexp
-	ExcludeUsers              StringFlags `yaml:"exclude-users"`
-	ExcludeUsersRegex         string      `yaml:"exclude-users-regex"`
-	ExcludeUsersRegexCompiled *regexp.Regexp
-	ExcludeListeners          bool `yaml:"exclude-listeners"`
-	Cancel                    bool `yaml:"cancel"`
+	mutex                         sync.Mutex
+	File                          string
+	Host                          string      `yaml:"host"`
+	Port                          int         `yaml:"port"`
+	User                          string      `yaml:"user"`
+	Password                      string      `yaml:"password"`
+	Database                      string      `yaml:"database"`
+	Interval                      float64     `yaml:"interval"`
+	ConnectTimeout                int         `yaml:"connect-timeout"`
+	IdleTimeout                   float64     `yaml:"idle-timeout"`
+	ActiveTimeout                 float64     `yaml:"active-timeout"`
+	LogDestination                string      `yaml:"log-destination"`
+	LogFile                       string      `yaml:"log-file"`
+	LogFormat                     string      `yaml:"log-format"`
+	PidFile                       string      `yaml:"pid-file"`
+	SyslogIdent                   string      `yaml:"syslog-ident"`
+	SyslogFacility                string      `yaml:"syslog-facility"`
+	IncludeUsers                  StringFlags `yaml:"include-users"`
+	IncludeUsersRegex             string      `yaml:"include-users-regex"`
+	IncludeUsersRegexCompiled     *regexp.Regexp
+	IncludeUsersFilters           []Filter
+	ExcludeUsers                  StringFlags `yaml:"exclude-users"`
+	ExcludeUsersRegex             string      `yaml:"exclude-users-regex"`
+	ExcludeUsersRegexCompiled     *regexp.Regexp
+	ExcludeUsersFilters           []Filter
+	IncludeDatabases              StringFlags `yaml:"include-databases"`
+	IncludeDatabasesRegex         string      `yaml:"include-databases-regex"`
+	IncludeDatabasesRegexCompiled *regexp.Regexp
+	IncludeDatabasesFilters       []Filter
+	ExcludeDatabases              StringFlags `yaml:"exclude-databases"`
+	ExcludeDatabasesRegex         string      `yaml:"exclude-databases-regex"`
+	ExcludeDatabasesRegexCompiled *regexp.Regexp
+	ExcludeDatabasesFilters       []Filter
+	ExcludeListeners              bool `yaml:"exclude-listeners"`
+	Cancel                        bool `yaml:"cancel"`
 }
 
 func init() {
@@ -83,6 +93,7 @@ func (c *Config) Reload() {
 	}
 	err := c.CompileRegexes()
 	Panic(err)
+	c.CompileFilters()
 }
 
 // Dsn formats a connection string based on Config
@@ -127,6 +138,43 @@ func (c *Config) CompileRegexes() (err error) {
 		}
 	}
 	return nil
+}
+
+// CompileFilters creates Filter objects based on patterns and compiled regexp
+func (c *Config) CompileFilters() {
+
+	c.IncludeUsersFilters = nil
+	if c.IncludeUsers != nil {
+		c.IncludeUsersFilters = append(c.IncludeUsersFilters, NewIncludeFilter(c.IncludeUsers))
+	}
+	if c.IncludeUsersRegexCompiled != nil {
+		c.IncludeUsersFilters = append(c.IncludeUsersFilters, NewIncludeFilterRegex(c.IncludeUsersRegexCompiled))
+	}
+
+	c.ExcludeUsersFilters = nil
+	if c.ExcludeUsers != nil {
+		c.ExcludeUsersFilters = append(c.ExcludeUsersFilters, NewExcludeFilter(c.ExcludeUsers))
+	}
+	if c.ExcludeUsersRegexCompiled != nil {
+		c.ExcludeUsersFilters = append(c.ExcludeUsersFilters, NewExcludeFilterRegex(c.ExcludeUsersRegexCompiled))
+	}
+
+	c.IncludeDatabasesFilters = nil
+	if c.IncludeDatabases != nil {
+		c.IncludeDatabasesFilters = append(c.IncludeDatabasesFilters, NewIncludeFilter(c.IncludeDatabases))
+	}
+	if c.IncludeDatabasesRegexCompiled != nil {
+		c.IncludeDatabasesFilters = append(c.IncludeDatabasesFilters, NewIncludeFilterRegex(c.IncludeDatabasesRegexCompiled))
+	}
+
+	c.ExcludeDatabasesFilters = nil
+	if c.ExcludeDatabases != nil {
+		c.ExcludeDatabasesFilters = append(c.ExcludeDatabasesFilters, NewExcludeFilter(c.ExcludeDatabases))
+	}
+	if c.ExcludeDatabasesRegexCompiled != nil {
+		c.ExcludeDatabasesFilters = append(c.ExcludeDatabasesFilters, NewExcludeFilterRegex(c.ExcludeDatabasesRegexCompiled))
+	}
+
 }
 
 // StringFlags append multiple string flags into a string slice

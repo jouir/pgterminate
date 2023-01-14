@@ -107,6 +107,10 @@ When include users list or regex is set, `pgterminate` will focus on included us
 
 When exclude users list or regex is set and no include option is set, `pgterminate` will terminate all sessions except excluded users.
 
+# Filtering databases
+
+Similar to users, `pgterminate` is able to filter sessions by database. The same set of options are available if you replace `user` by `database` (ex: `-include-user` to `-include-database` and so on).
+
 # Listeners
 
 LISTEN queries are asynchronous. Sessions are set to "idle" state even if they are waiting for messages to be sent to the queue. `pgterminate` can exclude sessions in that state by looking at the last known query starting with "LISTEN", with the `exclude-listeners` parameter.
