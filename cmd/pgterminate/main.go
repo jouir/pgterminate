@@ -43,6 +43,7 @@ func main() {
 	flag.StringVar(&config.User, "user", "", "Instance username")
 	flag.StringVar(&config.Password, "password", "", "Instance password")
 	flag.StringVar(&config.Database, "database", "", "Instance database")
+	flag.StringVar(&config.SSLMode, "sslmode", "", "SSL mode (see https://www.postgresql.org/docs/current/libpq-ssl.html)")
 	prompt := flag.Bool("prompt-password", false, "Prompt for password")
 	flag.Float64Var(&config.Interval, "interval", 1, "Time to sleep between iterations in seconds")
 	flag.IntVar(&config.ConnectTimeout, "connect-timeout", 3, "Connection timeout in seconds")

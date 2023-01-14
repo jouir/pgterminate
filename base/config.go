@@ -24,6 +24,7 @@ type Config struct {
 	User                          string      `yaml:"user"`
 	Password                      string      `yaml:"password"`
 	Database                      string      `yaml:"database"`
+	SSLMode                       string      `yaml:"sslmode"`
 	Interval                      float64     `yaml:"interval"`
 	ConnectTimeout                int         `yaml:"connect-timeout"`
 	IdleTimeout                   float64     `yaml:"idle-timeout"`
@@ -116,6 +117,9 @@ func (c *Config) Dsn() string {
 	}
 	if c.ConnectTimeout != 0 {
 		parameters = append(parameters, fmt.Sprintf("connect_timeout=%d", c.ConnectTimeout))
+	}
+	if c.SSLMode != "" {
+		parameters = append(parameters, fmt.Sprintf("sslmode=%s", c.SSLMode))
 	}
 	if AppName != "" {
 		parameters = append(parameters, fmt.Sprintf("application_name=%s", AppName))
