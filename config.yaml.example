@@ -14,19 +14,19 @@
 #syslog-ident: pgterminate
 #syslog-facility: LOCAL0
 #include-users:
-#    user1
-#    user2
+#  - user1
+#  - user2
 #include-users-regex: "(user1|user2)"
 #exclude-users:
-#    user1
-#    user2
+#  - user1
+#  - user2
 #exclude-users-regex: "(user1|user2)"
 #include-databases:
-#    db1
-#    db2
+#  - db1
+#  - db2
 #include-databases-regex: "(db1|db2)"
 #exclude-databases:
-#    db1
-#    db2
+#  - db1
+#  - db2
 #exclude-databases-regex: "(db1|db2)"
-#cancel
+#cancel: true
