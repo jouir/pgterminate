@@ -65,51 +65,55 @@ Print usage:
 pgterminate -help
 ```
 
-# Filtering users
+# Filters
 
-`pgterminate` is able to include or exclude users from being terminated.
+`pgterminate` is able to include or exclude from being terminated:
+- users
+- databases
 
 ## Configuration
+
 ### List
-Arguments `-include-user` or `-exclude-user` can be used multiple times for multiple users:
+
+The following arguments can be used called multiple times:
+- `-include-user`
+- `-exclude-user`
+- `-include-database`
+- `-exclude-database`
+
+Example:
 
 ```
 pgterminate -include-user user1 -include-user user2
 ```
-Or in configuration file:
+
+Or in configuration file (mind the plural form):
 
 ```
 include-users:
   user1
   user2
 ```
-Same applies for `-exclude-user` (argument) and `exclude-users` (file).
 
 ### Regexes
+
 Regexes can be configured:
 
 ```
 pgterminate -include-users-regex "(user1|user2)"
 ```
+
 Or in configuration file:
 
 ```
 include-users-regex: "(user1|user2)"
 ```
 
-Same applies for `-exclude-users-regex` (argument) and `exclude-users-regex` (file).
+## Inclusion and exclusion priority
 
-## Include users
-
-When include users list or regex is set, `pgterminate` will focus on included users only. It could terminate excluded users if any. If you want to exclude users, use exclude options only.
-
-## Exclude users
-
-When exclude users list or regex is set and no include option is set, `pgterminate` will terminate all sessions except excluded users.
-
-# Filtering databases
-
-Similar to users, `pgterminate` is able to filter sessions by database. The same set of options are available if you replace `user` by `database` (ex: `-include-user` to `-include-database` and so on).
+Include filters are applied before exclude filters. If a user or a database is
+both in the include and exclude filters, the user or database will be ignored
+by `pgterminate`.
 
 # Listeners
 
