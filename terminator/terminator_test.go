@@ -175,7 +175,7 @@ func TestFilterDatabases(t *testing.T) {
 	}
 }
 
-// ListDatabases extract usernames from a list of sessions
+// ListDatabases extract databases from a list of sessions
 func ListDatabases(sessions []*base.Session) (databases []string) {
 	for _, session := range sessions {
 		databases = append(databases, session.Db)
