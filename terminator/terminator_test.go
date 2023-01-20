@@ -51,17 +51,37 @@ func TestFilterUsers(t *testing.T) {
 			&base.Config{IncludeUsers: []string{"test", "test_1", "test_2"}, ExcludeUsers: []string{"test"}},
 			[]*base.Session{{User: "test_1"}, {User: "test_2"}},
 		},
+		{
+			"Include users from list and regex",
+			&base.Config{
+				IncludeUsers:      []string{"test"},
+				IncludeUsersRegex: "^test_[0-9]$",
+			},
+			[]*base.Session{{User: "test"}, {User: "test_1"}, {User: "test_2"}},
+		},
+		{
+			"Exclude users from list and regex",
+			&base.Config{
+				ExcludeUsers:      []string{"test"},
+				ExcludeUsersRegex: "^test_[0-9]$",
+			},
+			[]*base.Session{{User: "postgres"}},
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			err := tc.config.CompileRegexes()
+			if err != nil {
+				t.Errorf("Failed to compile regex: %v", err)
+			}
 			tc.config.CompileFilters()
 			terminator := &Terminator{config: tc.config}
 			got := terminator.filterUsers(sessions)
 			if !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("got %+v; want %+v", ListUsers(got), ListUsers(tc.want))
 			} else {
-				t.Logf("Success")
+				t.Logf("got %+v; want %+v", ListUsers(got), ListUsers(tc.want))
 			}
 		})
 	}
@@ -119,17 +139,37 @@ func TestFilterDatabases(t *testing.T) {
 			&base.Config{IncludeDatabases: []string{"test", "test_1", "test_2"}, ExcludeDatabases: []string{"test"}},
 			[]*base.Session{{Db: "test_1"}, {Db: "test_2"}},
 		},
+		{
+			"Include databases from list and regex",
+			&base.Config{
+				IncludeDatabases:      []string{"test"},
+				IncludeDatabasesRegex: "^test_[0-9]$",
+			},
+			[]*base.Session{{Db: "test"}, {Db: "test_1"}, {Db: "test_2"}},
+		},
+		{
+			"Exclude databases from list and regex",
+			&base.Config{
+				ExcludeDatabases:      []string{"test"},
+				ExcludeDatabasesRegex: "^test_[0-9]$",
+			},
+			[]*base.Session{{Db: "postgres"}},
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			err := tc.config.CompileRegexes()
+			if err != nil {
+				t.Errorf("Failed to compile regex: %v", err)
+			}
 			tc.config.CompileFilters()
 			terminator := &Terminator{config: tc.config}
 			got := terminator.filterDatabases(sessions)
 			if !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("got %+v; want %+v", ListDatabases(got), ListDatabases(tc.want))
 			} else {
-				t.Logf("Success")
+				t.Logf("got %+v; want %+v", ListDatabases(got), ListDatabases(tc.want))
 			}
 		})
 	}

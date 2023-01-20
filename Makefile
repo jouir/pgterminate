@@ -16,8 +16,8 @@ release:
 	(cd bin && tar czf ${BINARY}-${APPVERSION}-${GOOS}-${GOARCH}.tar.gz ${BINARY})
 
 test:
-	go test base/*
-	go test terminator/*
+	go test -cover base/*
+	go test -cover terminator/*
 
 clean:
 	rm -rf bin

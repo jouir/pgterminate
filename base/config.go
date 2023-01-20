@@ -141,6 +141,18 @@ func (c *Config) CompileRegexes() (err error) {
 			return err
 		}
 	}
+	if c.IncludeDatabasesRegex != "" {
+		c.IncludeDatabasesRegexCompiled, err = regexp.Compile(c.IncludeDatabasesRegex)
+		if err != nil {
+			return err
+		}
+	}
+	if c.ExcludeDatabasesRegex != "" {
+		c.ExcludeDatabasesRegexCompiled, err = regexp.Compile(c.ExcludeDatabasesRegex)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

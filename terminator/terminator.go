@@ -84,62 +84,66 @@ func (t *Terminator) filterListeners(sessions []*base.Session) (filtered []*base
 
 // filterUsers include and exclude users based on filters
 func (t *Terminator) filterUsers(sessions []*base.Session) []*base.Session {
-
 	var included []*base.Session
-	if t.config.IncludeUsersFilters == nil {
-		included = sessions
-	} else {
-		for _, filter := range t.config.IncludeUsersFilters {
-			for _, session := range sessions {
-				if filter.Include(session.User) {
-					included = append(included, session)
-				}
+	for _, filter := range t.config.IncludeUsersFilters {
+		for _, session := range sessions {
+			if filter.Include(session.User) && !session.InSlice(included) {
+				included = append(included, session)
 			}
 		}
 	}
 
-	var filtered []*base.Session
-	if t.config.ExcludeUsersFilters == nil {
-		filtered = included
-	} else {
-		for _, filter := range t.config.ExcludeUsersFilters {
-			for _, session := range included {
-				if filter.Include(session.User) {
-					filtered = append(filtered, session)
-				}
+	var excluded []*base.Session
+	for _, filter := range t.config.ExcludeUsersFilters {
+		for _, session := range sessions {
+			if !filter.Include(session.User) && !session.InSlice(excluded) {
+				excluded = append(excluded, session)
 			}
+		}
+	}
+
+	if included == nil {
+		included = sessions
+	}
+
+	var filtered []*base.Session
+	for _, session := range included {
+		if !session.InSlice(excluded) && !session.InSlice(filtered) {
+			filtered = append(filtered, session)
 		}
 	}
 
 	return filtered
 }
 
-// filterUsers include and exclude databases based on filters
+// filterDatabases include and exclude databases based on filters
 func (t *Terminator) filterDatabases(sessions []*base.Session) []*base.Session {
-
 	var included []*base.Session
-	if t.config.IncludeDatabasesFilters == nil {
-		included = sessions
-	} else {
-		for _, filter := range t.config.IncludeDatabasesFilters {
-			for _, session := range sessions {
-				if filter.Include(session.Db) {
-					included = append(included, session)
-				}
+	for _, filter := range t.config.IncludeDatabasesFilters {
+		for _, session := range sessions {
+			if filter.Include(session.Db) && !session.InSlice(included) {
+				included = append(included, session)
 			}
 		}
 	}
 
-	var filtered []*base.Session
-	if t.config.ExcludeDatabasesFilters == nil {
-		filtered = included
-	} else {
-		for _, filter := range t.config.ExcludeDatabasesFilters {
-			for _, session := range included {
-				if filter.Include(session.Db) {
-					filtered = append(filtered, session)
-				}
+	var excluded []*base.Session
+	for _, filter := range t.config.ExcludeDatabasesFilters {
+		for _, session := range sessions {
+			if !filter.Include(session.Db) && !session.InSlice(excluded) {
+				excluded = append(excluded, session)
 			}
+		}
+	}
+
+	if included == nil {
+		included = sessions
+	}
+
+	var filtered []*base.Session
+	for _, session := range included {
+		if !session.InSlice(excluded) && !session.InSlice(filtered) {
+			filtered = append(filtered, session)
 		}
 	}
 
